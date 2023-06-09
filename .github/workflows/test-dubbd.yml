@@ -1,0 +1,39 @@
+name: "Test DUBBD on K3d"
+
+on:
+  push:
+   branches:
+   - "main"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS cli
+        env:
+          ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+        run: |
+          aws configure set aws_access_key_id "$ACCESS_KEY_ID"
+          aws configure set aws_secret_access_key "$SECRET_ACCESS_KEY"
+          aws configure set default.region us-east-1
+
+      - name: Install zarf
+        uses: defenseunicorns/setup-zarf@main
+        with:
+          version: v0.27.1
+          download-init-package: true
+
+      - name: Build DUBBD package
+        run: |
+          git clone https://github.com/defenseunicorns/uds-package-dubbd.git
+          cd uds-package-dubbd/k3d || exit
+          zarf package create --confirm
+          mv zarf-package-* ../../
+
+      - name: Create cluster and deploy DUBBD
+        run: make deploy
+
+      - name: Teardown cluster
+        run: make destroy
+        if: always()

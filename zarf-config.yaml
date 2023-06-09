@@ -1,0 +1,7 @@
+package:
+  deploy:
+    set:
+      domain: bigbang.dev
+      public_key_file: bigbang.dev.key
+      public_cert_file: bigbang.dev.cert
+      host_path: "/var/lib/rancher/k3s/storage/*"
