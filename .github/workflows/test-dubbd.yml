@@ -24,6 +24,12 @@ jobs:
           version: v0.27.1
           download-init-package: true
 
+      - name: Login to Registry1
+        env:
+          REGISTRY1_USERNAME: ${{ secrets.REGISTRY1_USERNAME }}
+          REGISTRY1_PASSWORD: ${{ secrets.REGISTRY1_PASSWORD }}
+        run: zarf tools registry login -u "$REGISTRY1_USERNAME" "$REGISTRY1_PASSWORD"
+
       - name: Build DUBBD package
         run: |
           git clone https://github.com/defenseunicorns/uds-package-dubbd.git
