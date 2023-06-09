@@ -30,6 +30,9 @@ jobs:
           REGISTRY1_PASSWORD: ${{ secrets.REGISTRY1_PASSWORD }}
         run: zarf tools registry login -u "$REGISTRY1_USERNAME" "$REGISTRY1_PASSWORD"
 
+      - name: Pull flux helm controller image
+        run: docker pull registry1.dso.mil/ironbank/fluxcd/helm-controller:v0.32.1
+
       - name: Build DUBBD package
         run: |
           git clone https://github.com/defenseunicorns/uds-package-dubbd.git
