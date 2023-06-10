@@ -28,17 +28,7 @@ jobs:
         env:
           REGISTRY1_USERNAME: ${{ secrets.REGISTRY1_USERNAME }}
           REGISTRY1_PASSWORD: ${{ secrets.REGISTRY1_PASSWORD }}
-        run: zarf tools registry login -u "$REGISTRY1_USERNAME" "$REGISTRY1_PASSWORD"
-
-      - name: Pull flux helm controller image
-        run: docker pull registry1.dso.mil/ironbank/fluxcd/helm-controller:v0.32.1
-
-      - name: Build DUBBD package
-        run: |
-          git clone https://github.com/defenseunicorns/uds-package-dubbd.git
-          cd uds-package-dubbd/k3d || exit
-          zarf package create --confirm
-          mv zarf-package-* ../../
+        run: zarf tools registry login registry1.dso.mil -u "$REGISTRY1_USERNAME" -p "$REGISTRY1_PASSWORD"
 
       - name: Create cluster and deploy DUBBD
         run: make deploy
