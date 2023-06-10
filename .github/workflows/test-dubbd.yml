@@ -24,11 +24,10 @@ jobs:
           version: v0.27.1
           download-init-package: true
 
-      - name: Login to Registry1
+      - name: Login to ghcr.io
         env:
-          REGISTRY1_USERNAME: ${{ secrets.REGISTRY1_USERNAME }}
-          REGISTRY1_PASSWORD: ${{ secrets.REGISTRY1_PASSWORD }}
-        run: zarf tools registry login registry1.dso.mil -u "$REGISTRY1_USERNAME" -p "$REGISTRY1_PASSWORD"
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: zarf tools registry login ghcr.io -u "lucasrod16" -p "$GHCR_TOKEN"
 
       - name: Checkout code
         uses: actions/checkout@v3

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-rm -rf .terraform* run tmp zarf-sbom extract-terraform.sh kubeconfig.yaml
+client_ip="$(curl -s "https://checkip.amazonaws.com")"
 
 terraform init -upgrade
 
-terraform destroy --auto-approve
+terraform destroy -var="client_ip=$client_ip" --auto-approve
