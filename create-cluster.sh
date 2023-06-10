@@ -1,8 +1,6 @@
 #!/bin/bash
 
-client_ip="$(curl -s "https://checkip.amazonaws.com")"
-
-function check_error() {
+function checkError() {
     if [ $? -ne 0 ]
     then
         echo "Terraform exited with error"
@@ -10,35 +8,50 @@ function check_error() {
     fi
 }
 
+function waitInstanceReady() {
+    timeout="$(( $(date +%s) + 600 ))"  # Set the timeout to 10 minutes (600 seconds)
+    while true
+    do
+        echo "Waiting for EC2 instance to be ready"
+        instance_state="$(aws ec2 describe-instances --instance-ids "$1" --query "Reservations[].Instances[].State.Name" --output text)"
+
+        if [[ $instance_state == "running" ]]
+        then
+            instance_status="$(aws ec2 describe-instance-status --instance-ids "$1" --query "InstanceStatuses[].InstanceStatus[].Status" --output text)"
+
+            if [[ $instance_status == "ok" ]]
+            then
+                echo "Instance is ready!"
+                break
+            fi
+        fi
+
+        current_time="$(date +%s)"
+        if (( current_time >= timeout ))
+        then
+            echo "Timed out waiting for EC2 instance to be ready"
+            exit 1
+        fi
+
+        sleep 5
+    done
+}
+
+client_ip="$(curl -s "https://checkip.amazonaws.com")"
+
 terraform init -upgrade
-check_error
+checkError
 
 terraform plan -var="client_ip=$client_ip"
-check_error
+checkError
 
 terraform apply -var="client_ip=$client_ip" --auto-approve
-check_error
+checkError
 
 instance_id="$(terraform output -raw instance_id)"
 s3_bucket="$(terraform output -raw s3_bucket)"
 
-while true
-do
-    echo "Waiting for EC2 instance to be ready"
-    instance_state="$(aws ec2 describe-instances --instance-ids "$instance_id" --query "Reservations[].Instances[].State.Name" --output text)"
-
-    if [[ $instance_state == "running" ]]
-    then
-        instance_status="$(aws ec2 describe-instance-status --instance-ids "$instance_id" --query "InstanceStatuses[].InstanceStatus[].Status" --output text)"
-
-        if [[ $instance_status == "ok" ]]
-        then
-            echo "Instance is ready!"
-            break
-        fi
-    fi
-    sleep 5
-done
+waitInstanceReady "$instance_id"
 
 rm -rf ~/.kube/config
 
