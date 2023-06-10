@@ -30,6 +30,9 @@ jobs:
           REGISTRY1_PASSWORD: ${{ secrets.REGISTRY1_PASSWORD }}
         run: zarf tools registry login registry1.dso.mil -u "$REGISTRY1_USERNAME" -p "$REGISTRY1_PASSWORD"
 
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Create cluster and deploy DUBBD
         run: make deploy
 
