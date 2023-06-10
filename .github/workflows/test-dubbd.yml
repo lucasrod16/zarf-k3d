@@ -6,7 +6,7 @@ on:
    - "main"
 
 jobs:
-  test:
+  test-dubbd-k3d:
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS cli

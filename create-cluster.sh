@@ -40,8 +40,8 @@ do
     sleep 5
 done
 
-aws s3 cp s3://"$s3_bucket"/kubeconfig.yaml .
+rm -rf ~/.kube/config
 
-export KUBECONFIG="./kubeconfig.yaml"
+aws s3 cp s3://"$s3_bucket"/kubeconfig.yaml ~/.kube/config
 
-zarf tools kubectl get nodes -o wide --kubeconfig ./kubeconfig.yaml
+zarf tools kubectl get nodes -o wide
