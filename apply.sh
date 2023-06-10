@@ -1,23 +1,12 @@
 #!/bin/bash
 
-function check_error {
-    if [[ $? -eq 0 ]]
-    then
-        echo "Terraform exited with error"
-        exit 1
-    fi
-}
-
 client_ip="$(curl -s "https://checkip.amazonaws.com")"
 
 terraform init -upgrade
-check_error
 
 terraform plan
-check_error
 
 terraform apply -var="client_ip=$client_ip" --auto-approve
-check_error
 
 instance_id="$(terraform output -raw instance_id)"
 s3_bucket="$(terraform output -raw s3_bucket)"
