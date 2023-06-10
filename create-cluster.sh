@@ -45,7 +45,3 @@ aws s3 cp s3://"$s3_bucket"/kubeconfig.yaml .
 export KUBECONFIG="./kubeconfig.yaml"
 
 zarf tools kubectl get nodes -o wide --kubeconfig ./kubeconfig.yaml
-
-# zarf init -a amd64 --components=git-server --confirm
-
-# zarf package deploy oci://ghcr.io/lucasrod16/dubbd-k3d:0.2.1-amd64 --confirm

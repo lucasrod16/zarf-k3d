@@ -1,5 +1,5 @@
-deploy: ## Deploy k3d cluster and deploy DUBBD
-	./apply.sh
+create-cluster: ## Create k3d cluster
+	./create-cluster.sh	
 
-destroy: ## Teardown cluster
-	./destroy.sh
+teardown-cluster: ## Teardown cluster
+	./teardown-cluster.sh
