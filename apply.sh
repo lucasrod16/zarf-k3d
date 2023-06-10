@@ -2,11 +2,22 @@
 
 client_ip="$(curl -s "https://checkip.amazonaws.com")"
 
-terraform init -upgrade
+function check_error() {
+    if [ $? -ne 0 ]
+    then
+        echo "Terraform exited with error"
+        exit 1
+    fi
+}
 
-terraform plan
+terraform init -upgrade
+check_error
+
+terraform plan -var="client_ip=$client_ip"
+check_error
 
 terraform apply -var="client_ip=$client_ip" --auto-approve
+check_error
 
 instance_id="$(terraform output -raw instance_id)"
 s3_bucket="$(terraform output -raw s3_bucket)"
@@ -35,6 +46,6 @@ export KUBECONFIG="./kubeconfig.yaml"
 
 zarf tools kubectl get nodes -o wide --kubeconfig ./kubeconfig.yaml
 
-zarf init -a amd64 --components=git-server --confirm
+# zarf init -a amd64 --components=git-server --confirm
 
-zarf package deploy oci://ghcr.io/lucasrod16/dubbd-k3d:0.2.1-amd64 --confirm
+# zarf package deploy oci://ghcr.io/lucasrod16/dubbd-k3d:0.2.1-amd64 --confirm
