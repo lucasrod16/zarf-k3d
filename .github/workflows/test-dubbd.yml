@@ -41,7 +41,7 @@ jobs:
         run: zarf init -a amd64 --components=git-server --confirm
 
       - name: Deploy DUBBD
-        run: zarf package deploy oci://ghcr.io/lucasrod16/dubbd-k3d:0.2.1-amd64 --confirm
+        run: zarf package deploy oci://ghcr.io/defenseunicorns/packages/big-bang-distro-k3d:0.2.1-amd64 --confirm
 
       - name: Teardown cluster
         run: make teardown-cluster
