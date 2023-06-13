@@ -1,3 +1,7 @@
+resource "random_id" "unique_id" {
+  byte_length = 4
+}
+
 resource "aws_instance" "ec2_instance" {
   ami                    = "ami-0148347da6004e644"
   instance_type          = "m5.4xlarge"                                   # vCPU: 16 -- RAM: 64GB
@@ -18,7 +22,7 @@ resource "aws_instance" "ec2_instance" {
 }
 
 resource "aws_security_group" "security_group" {
-  name        = "kube-api-access"
+  name        = "kube-api-access-${random_id.unique_id.hex}"
   description = "Allow Kube API access only from GitHub runner"
 
   ingress {
@@ -37,12 +41,12 @@ resource "aws_security_group" "security_group" {
 }
 
 resource "aws_iam_instance_profile" "instance_profile" {
-  name = "upload_kubeconfig"
+  name = "upload_kubeconfig-${random_id.unique_id.hex}"
   role = aws_iam_role.instance_role.name
 }
 
 resource "aws_iam_role" "instance_role" {
-  name = "upload_kubeconfig"
+  name = "upload_kubeconfig-${random_id.unique_id.hex}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -59,7 +63,7 @@ resource "aws_iam_role" "instance_role" {
 }
 
 resource "aws_iam_policy" "s3_policy" {
-  name        = "upload_kubeconfig_s3_policy"
+  name        = "upload_kubeconfig_s3_policy-${random_id.unique_id.hex}"
   description = "Allows uploading files to S3 bucket"
 
   policy = jsonencode({
