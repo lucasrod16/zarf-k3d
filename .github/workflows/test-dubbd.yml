@@ -46,3 +46,42 @@ jobs:
       - name: Teardown cluster
         run: make teardown-cluster
         if: always()
+
+  test-dubbd-aws:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS cli
+        env:
+          ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+        run: |
+          aws configure set aws_access_key_id "$ACCESS_KEY_ID"
+          aws configure set aws_secret_access_key "$SECRET_ACCESS_KEY"
+          aws configure set default.region us-east-1
+
+      - name: Install zarf
+        uses: defenseunicorns/setup-zarf@main
+        with:
+          version: v0.27.1
+          download-init-package: true
+
+      - name: Login to ghcr.io
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: zarf tools registry login ghcr.io -u "lucasrod16" -p "$GHCR_TOKEN"
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create cluster
+        run: make create-cluster
+
+      - name: Zarf init
+        run: zarf init -a amd64 --components=git-server --confirm
+
+      - name: Deploy DUBBD
+        run: zarf package deploy oci://ghcr.io/defenseunicorns/packages/dubbd-aws:0.2.2-amd64 --confirm
+
+      - name: Teardown cluster
+        run: make teardown-cluster
+        if: always()
