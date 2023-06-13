@@ -92,7 +92,7 @@ module "s3" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "v3.10.1"
 
-  bucket_prefix = "lucas-dev-"
+  bucket_prefix = aws_instance.ec2_instance.id
 
   block_public_acls       = true
   block_public_policy     = true
